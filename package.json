@@ -9,7 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@notionhq/client": "^0.4.13",
+    "api": "^4.2.0",
     "axios": "^0.26.0",
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.0.0",
+    "node-fetch": "^3.2.0"
   }
 }

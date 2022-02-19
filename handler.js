@@ -1,6 +1,37 @@
 'use strict';
 const axios = require('axios');
-require('dotenv').config();
+const dotenv = require('dotenv').config();
+const { Client } = require("@notionhq/client");
+
+const notion = new Client({
+   auth: process.env.NOTION_ID
+});
+
+const databaseId = process.env.NOTION_DATABASE_ID
+
+async function addItem(text) {
+  try {
+    const response = await notion.pages.create({
+      parent: { database_id: databaseId },
+      properties: {
+        title: { 
+          title:[
+            {
+              "text": {
+                "content": text
+              }
+            }
+          ]
+        }
+      },
+    })
+    console.log(response)
+    console.log("Success! Entry added.")
+  } catch (error) {
+    console.error(error.body)
+  }
+}
+
 
 module.exports.hello = async event => {
   console.log(event);
@@ -8,31 +39,22 @@ module.exports.hello = async event => {
   const msg = telegramBody.message;
   const chatId = msg.chat.id;
   const text = msg.text;
-
-  const regex = new RegExp(`/hello (.*)`);
-  const captureGroups = text.match(regex);
-  if (captureGroups && captureGroups.length > 1) {
-    const value = captureGroups[1];
-    try {
-      const res = await axios.post(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
-      {
-        chat_id: chatId,
-        text: `Hello, ${value}!`
-      });
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ result: res.data })
-      }
-    } catch (err) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: err })
-      }
-    };
-  } else {
+  
+  addItem(text);
+  try {
+    const res = await axios.post(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
+    {
+      chat_id: chatId,
+      text: `DONE!`
+    });
     return {
       statusCode: 200,
-      body: JSON.stringify({ match: false })
+      body: JSON.stringify({ result: res.data })
     }
-  }
+  } catch (err) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: err })
+    }
+  };
 };
