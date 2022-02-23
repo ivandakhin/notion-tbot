@@ -40,13 +40,15 @@ module.exports.hello = async event => {
   const chatId = msg.chat.id;
   const text = msg.text;
   
-  addItem(text);
   try {
     const res = await axios.post(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
     {
       chat_id: chatId,
       text: `DONE!`
     });
+     
+    addItem(text);
+    
     return {
       statusCode: 200,
       body: JSON.stringify({ result: res.data })
